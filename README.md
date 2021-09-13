@@ -1,91 +1,137 @@
-# gifsicle
+![gifsicle-logo](https://raw.githubusercontent.com/kohler/gifsicle/master/logo.gif)
+
+Gifsicle
+========
+[![TravisCI status](https://travis-ci.com/kohler/gifsicle.svg?branch=master)](https://travis-ci.com/kohler/gifsicle)
+
+Gifsicle manipulates GIF image files. Depending on command line
+options, it can merge several GIFs into a GIF animation; explode an
+animation into its component frames; change individual frames in an
+animation; turn interlacing on and off; add transparency; add delays,
+disposals, and looping to animations; add and remove comments; flip
+and rotate; optimize animations for space; change images' colormaps;
+and other things.
+
+Gifview, a companion program, displays GIF images and animations on an
+X display. It can display multi-frame GIFs either as slideshows,
+displaying one frame at a time, or as real-time animations.
+
+Gifdiff, another companion program, checks two GIF files for identical
+visual appearance. This is probably most useful for testing
+GIF-manipulating software.
+
+Each of these programs has a manpage, `PROGRAMNAME.1`.
+
+The Gifsicle package comes with NO WARRANTY, express or implied,
+including, but not limited to, the implied warranties of
+merchantability and fitness for a particular purpose.
+
+See `NEWS.md` in this directory for changes in recent versions. The Gifsicle
+home page is:
+
+http://www.lcdf.org/gifsicle/
 
 
+Building Gifsicle on UNIX
+-------------------------
 
-## Getting started
+Type `./configure`, then `make`.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+If `./configure` does not exist (you downloaded from Github), run
+`autoreconf -i` first.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+`./configure` accepts the usual options; see `INSTALL` for details.
+To build without gifview (for example, if you don't have X11), use
+`./configure --disable-gifview`. To build without gifdiff,
+use `./configure --disable-gifdiff`.
 
-## Add your files
+`make install` will build and install Gifsicle and its manual page
+(under /usr/local by default).
 
-- [ ] [Create](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
 
-```
-cd existing_repo
-git remote add origin https://gitlab.com/animately/gifsicle.git
-git branch -M main
-git push -uf origin main
-```
+Building Gifsicle on Windows
+----------------------------
 
-## Integrate with your tools
+To build Gifsicle on Windows using Visual C, change into the `src`
+directory and run
 
-- [ ] [Set up project integrations](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/project/integrations/)
+    nmake -f Makefile.w32
 
-## Collaborate with your team
+Gifview will not be built. The makefile is from Emil Mikulic
+<darkmoon@connexus.net.au> with updates by Steven Marthouse
+<comments@vrml3d.com>.
 
-- [ ] [Invite team members and collaborators](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Automatically merge when pipeline succeeds](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+To build Gifsicle on Windows using Borland C++, change into the `src`
+directory and run
 
-## Test and Deploy
+    nmake -f Makefile.bcc
 
-Use the built-in continuous integration in GitLab.
+Stephen Schnipsel <schnipsel@m4f.net> provided `Makefile.bcc`. You
+will need to edit one of these Makefiles to use a different compiler.
+You can edit it with any text editor (like Notepad). See the file for
+more information.
 
-- [ ] [Get started with GitLab CI/CD](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://docs.gitlab.com/ee/user/clusters/agent/)
 
-***
+Contact
+-------
 
-# Editing this README
+If you have trouble building or running Gifsicle, try GitHub issues:
+https://github.com/kohler/gifsicle
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!).  Thank you to [makeareadme.com](https://gitlab.com/-/experiment/new_project_readme_content:5589f535b7851e82885f13c06197689e?https://www.makeareadme.com/) for this template.
+Eddie Kohler, ekohler@gmail.com  
+http://www.read.seas.harvard.edu/~kohler/  
+Please note that I do not provide support for Windows.
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
-## Name
-Choose a self-explaining name for your project.
+Copyright/License
+-----------------
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+All source code is Copyright (C) 1997-2021 Eddie Kohler.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+IF YOU PLAN TO USE GIFSICLE ONLY TO CREATE OR MODIFY GIF IMAGES, DON'T
+WORRY ABOUT THE REST OF THIS SECTION. Anyone can use Gifsicle however
+they wish; the license applies only to those who plan to copy,
+distribute, or alter its code. If you use Gifsicle for an
+organizational or commercial Web site, I would appreciate a link to
+the Gifsicle home page on any 'About This Server' page, but it's not
+required.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+This code is distributed under the GNU General Public License, Version
+2 (and only Version 2). The GNU General Public License is available
+via the Web at <http://www.gnu.org/licenses/gpl.html> or in the
+'COPYING' file in this directory.
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+The following alternative license may be used at your discretion.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+Permission is granted to copy, distribute, or alter Gifsicle, whole or
+in part, as long as source code copyright notices are kept intact,
+with the following restriction: Developers or distributors who plan to
+use Gifsicle code, whole or in part, in a product whose source code
+will not be made available to the end user -- more precisely, in a
+context which would violate the GPL -- MUST contact the author and
+obtain permission before doing so.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+Authors
+-------
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+Eddie Kohler <ekohler@gmail.com> \
+http://www.read.seas.harvard.edu/~kohler/ \
+He wrote it.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+Anne Dudfield <anne@mazunetworks.com> \
+http://www.frii.com/~annied/ \
+She named it.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+David Hedbor <david@hedbor.org> \
+Many bug reports and constructive whining about the optimizer.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Emil Mikulic <darkmoon@connexus.net.au> \
+Win32 port help.
 
-## License
-For open source projects, say how it is licensed.
+Hans Dinsen-Hansen <dino@danbbs.dk> \
+http://www.danbbs.dk/~dino/ \
+Adaptive tree method for GIF writing.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
-
+Kornel Lesiński \
+`--lossy` option.
