@@ -1072,11 +1072,18 @@ write_gif(Gif_Stream *gfs, Gif_Writer *grr)
 
 int
 Gif_FullWriteFile(Gif_Stream *gfs, const Gif_CompressInfo *gcinfo,
-                  FILE *f)
+                  FILE *f, uint8_t** buffer, uint32_t* size)
 {
   Gif_Writer grr;
   int ok = gif_writer_init(&grr, f, gcinfo)
            && write_gif(gfs, &grr);
+          
+  if (size) {
+    *buffer = grr.v;
+    *size = grr.pos;
+    grr.v = NULL;
+  }
+
   gif_writer_cleanup(&grr);
   return ok;
 }
@@ -1140,7 +1147,7 @@ Gif_CompressImage(Gif_Stream *gfs, Gif_Image *gfi)
 int
 Gif_WriteFile(Gif_Stream *gfs, FILE *f)
 {
-  return Gif_FullWriteFile(gfs, 0, f);
+  return Gif_FullWriteFile(gfs, 0, f, NULL, NULL);
 }
 
 

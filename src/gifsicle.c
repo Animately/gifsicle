@@ -825,7 +825,7 @@ input_done(void)
   if (mode == DELETING)
     frame_change_done();
   if (mode == BATCHING || mode == EXPLODING)
-    output_frames();
+    output_frames(NULL, NULL);
 }
 
 
@@ -926,6 +926,17 @@ do_colormap_change(Gif_Stream *gfs)
  * output GIF images
  **/
 
+#if 1
+
+static void
+write_stream(const char *output_name, Gif_Stream *gfs, uint8_t** data_buffer, uint32_t* size)
+{
+  Gif_FullWriteFile(gfs, &gif_write_info, NULL, data_buffer, size);
+  any_output_successful = 1;
+}
+
+#else
+
 static void
 write_stream(const char *output_name, Gif_Stream *gfs)
 {
@@ -959,8 +970,10 @@ write_stream(const char *output_name, Gif_Stream *gfs)
     lerror(output_name, "%s", strerror(errno));
 }
 
+#endif
+
 static void
-merge_and_write_frames(const char *outfile, int f1, int f2)
+merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, uint32_t* size)
 {
   Gif_Stream *out;
   int compress_immediately;
@@ -1004,7 +1017,9 @@ merge_and_write_frames(const char *outfile, int f1, int f2)
       apply_color_transforms(output_transforms, out);
     if (active_output_data.optimizing & GT_OPT_MASK)
       optimize_fragments(out, active_output_data.optimizing, huge_stream);
-    write_stream(outfile, out);
+
+    write_stream(outfile, out, buffer, size);
+
     Gif_DeleteStream(out);
   }
 
@@ -1054,7 +1069,7 @@ output_information(const char *outfile)
 }
 
 void
-output_frames(void)
+output_frames(uint8_t** buffer, uint32_t* size)
 {
   /* Use the current output name, not the stored output name.
      This supports 'gifsicle a.gif -o xxx'.
@@ -1074,7 +1089,7 @@ output_frames(void)
      case MERGING:
      case BATCHING:
      case INFOING:
-      merge_and_write_frames(outfile, 0, -1);
+      merge_and_write_frames(outfile, 0, -1, buffer, size);
       break;
 
      case EXPLODING: {
@@ -1102,7 +1117,7 @@ output_frames(void)
 
          explodename = explode_filename(outfile, imagenumber, imagename,
                                         max_nimages);
-         merge_and_write_frames(explodename, i, i);
+         merge_and_write_frames(explodename, i, i, NULL, NULL);
        }
        break;
      }
@@ -1417,7 +1432,7 @@ error:
  **/
 
 int
-gifsicle_main(int argc, const char *argv[], const uint8_t* buffer, size_t size)
+gifsicle_main(int argc, const char *argv[], const uint8_t* buffer, size_t size, uint8_t** output_buffer, uint32_t* output_size)
 {
   /* Check SIZEOF constants (useful for Windows). If these assertions fail,
      you've used the wrong Makefile. You should've used Makefile.w32 for
@@ -2148,8 +2163,9 @@ particular purpose.\n");
 
   frame_change_done();
   input_done();
+
   if ((mode == MERGING && !error_count) || mode == INFOING)
-    output_frames();
+    output_frames(output_buffer, output_size);
 
   verbose_endline();
   print_useless_options("frame", next_frame, frame_option_types);

@@ -307,7 +307,7 @@ extern const char *input_name;
 
 void            input_stream(const char *, const uint8_t*, size_t);
 void            input_done(void);
-void            output_frames(void);
+void            output_frames(uint8_t**, uint32_t*);
 
 /*****
  * stuff with frames

@@ -59,7 +59,6 @@ typedef struct Gif_ReaderBuffer {
 static uint8_t
 buffer_byte_getter(Gif_ReaderBuffer *grr)
 {
-    printf("get byte\n");
     if (grr->pos < grr->size)
     {
       int i = grr->buffer[grr->pos];

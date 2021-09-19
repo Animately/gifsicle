@@ -270,7 +270,7 @@ Gif_Stream*     Gif_FullReadRecord(const Gif_Record* record, int flags,
                                    Gif_ReadErrorHandler handler);
 int             Gif_WriteFile(Gif_Stream *gfs, FILE *f);
 int             Gif_FullWriteFile(Gif_Stream *gfs,
-                                  const Gif_CompressInfo *gcinfo, FILE *f);
+                                  const Gif_CompressInfo *gcinfo, FILE *f, uint8_t** buffer, uint32_t* size);
 
 #define Gif_ReadFile(f)         Gif_FullReadFile((f),GIF_READ_UNCOMPRESSED,0,0)
 #define Gif_ReadRecord(r)       Gif_FullReadRecord((r),GIF_READ_UNCOMPRESSED,0,0)
