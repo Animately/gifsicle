@@ -30,4 +30,4 @@ compile
 build/
 server/
 .vscode/
-a.wasm
+*.wasm
