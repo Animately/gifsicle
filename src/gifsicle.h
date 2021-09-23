@@ -28,6 +28,16 @@ typedef struct Gt_ColorTransform Gt_ColorTransform;
 extern pthread_mutex_t kd3_sort_lock;
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+int gifsicle_main(int argc, char *argv[], const uint8_t* buffer, size_t size, uint8_t** output_buffer, uint32_t* output_size);
+
+#ifdef __cplusplus
+}
+#endif
+
 typedef struct Gt_Frame {
 
   Gif_Stream *stream;

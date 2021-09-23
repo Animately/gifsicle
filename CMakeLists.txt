@@ -27,6 +27,7 @@ add_executable(gifsicle
     src/gifsicle.c
     src/gifwrite.c
     src/bind.cpp
+    src/coptions.cpp
 )
 target_compile_definitions(gifsicle PUBLIC HAVE_CONFIG_H)
 target_include_directories(gifsicle PUBLIC include ./)

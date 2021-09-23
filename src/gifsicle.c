@@ -1432,7 +1432,7 @@ error:
  **/
 
 int
-gifsicle_main(int argc, const char *argv[], const uint8_t* buffer, size_t size, uint8_t** output_buffer, uint32_t* output_size)
+gifsicle_main(int argc, char *argv[], const uint8_t* buffer, size_t size, uint8_t** output_buffer, uint32_t* output_size)
 {
   /* Check SIZEOF constants (useful for Windows). If these assertions fail,
      you've used the wrong Makefile. You should've used Makefile.w32 for
