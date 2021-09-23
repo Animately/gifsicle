@@ -64,7 +64,7 @@ size_t COptions::count() const
 bool parse_options(const GifOptions& gif_options, COptions& options)
 {
     // stub for input and output file
-    // first paramter call main stub
+    // first parameter call main stub
     options.add_option("");
     options.add_option("-i", "file");
     options.add_option("-o", "file");
