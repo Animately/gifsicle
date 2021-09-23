@@ -36,7 +36,7 @@ EMSCRIPTEN_BINDINGS(GifSicle)
     value_object<GifOptions>("GifOptions")
         .field("lossy", &GifOptions::lossy)
         .field("optimize", &GifOptions::optimize)
-        .field("scale_x", &GifOptions::scale_x)
-        .field("scale_y", &GifOptions::scale_y)
+        .field("scaleX", &GifOptions::scale_x)
+        .field("scaleY", &GifOptions::scale_y)
         .field("colors", &GifOptions::colors);
 }
