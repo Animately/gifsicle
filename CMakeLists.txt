@@ -7,7 +7,7 @@ option(DEBUG "debug version of wasm with -g2 level" OFF)
 set(CMAKE_C_COMPILER "emcc")
 set(CMAKE_CXX_COMPILER "em++")
 
-set(GIFSICLE_EMCC_FLAGS "--bind -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s ALLOW_MEMORY_GROWTH=1 -s WASM=1 -s MODULARIZE=1 -s EXPORT_NAME=Gifsicle -O3")
+set(GIFSICLE_EMCC_FLAGS "--bind -s ALLOW_MEMORY_GROWTH=1 -s WASM=1 -s MODULARIZE=1 -s EXPORT_NAME=Gifsicle -O3")
 if (DEBUG)
     message("Build with debug info")
     set(GIFSICLE_EMCC_FLAGS "${GIFSICLE_EMCC_FLAGS} -g2 -s ASSERTIONS=2")
@@ -27,7 +27,7 @@ add_executable(gifsicle
     src/gifsicle.c
     src/gifwrite.c
     src/bind.cpp
-    src/coptions.cpp
+    src/utility.cpp
 )
 target_compile_definitions(gifsicle PUBLIC HAVE_CONFIG_H)
 target_include_directories(gifsicle PUBLIC include ./)

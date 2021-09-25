@@ -1,7 +1,7 @@
-#include "coptions.h"
+#include "utility.h"
 
-#include <iostream>
 #include <stdio.h>
+#include <lcdfgif/gif.h>
 
 constexpr auto options_capacity = 20;
 
@@ -90,8 +90,13 @@ bool parse_options(const GifOptions& gif_options, COptions& options)
     return true;
 }
 
-
 std::string value(size_t value)
 {
     return std::to_string(value);
+}
+
+GifBuffer::~GifBuffer()
+{
+    if (data)
+        Gif_DeleteArray(data);
 }

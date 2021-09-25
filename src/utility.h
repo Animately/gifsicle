@@ -3,8 +3,6 @@
 #include <stddef.h>
 #include <string>
 
-std::string value(size_t value);
-
 struct GifOptions
 {
     size_t lossy;
@@ -31,4 +29,13 @@ private:
     size_t m_capacity;
 };
 
+std::string value(size_t value);
 bool parse_options(const GifOptions& gif_options, COptions& options);
+
+struct GifBuffer
+{
+    ~GifBuffer();
+
+    uint8_t* data;
+    uint32_t size;
+};
