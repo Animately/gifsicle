@@ -5,19 +5,29 @@
 
 #include "utility.h"
 #include "gifsicle.h"
+#include "progress.h"
 
 using namespace emscripten;
 
-val compress(const std::uintptr_t data, const std::size_t size, const GifOptions& gif_options)
+val compress(const std::uintptr_t data, const std::size_t size, const GifOptions& gif_options, emscripten::val on_progress)
 {
     COptions options;
     if (!parse_options(gif_options, options))
         return val::null();
 
+    ProgressManager::instance().setOnProgress([on_progress](const auto value) { on_progress(value); });
+    ProgressManager::instance().applyOptions(gif_options);
+
     const auto* input_buffer = reinterpret_cast<const uint8_t*>(data);
 
     GifBuffer buffer;
-    const auto status = gifsicle_main(options.count(), options.options(), input_buffer, size, &buffer.data, &buffer.size);
+    const auto status = gifsicle_main(options.count(), options.options(), 
+                                      input_buffer, size, &buffer.data, &buffer.size);
+
+    for (const auto[index, count] : ProgressManager::instance().data)
+    {
+        std::cout << index << " " << count << std::endl;
+    }    
 
     if (!buffer.data || status != 0) 
         return val::null();

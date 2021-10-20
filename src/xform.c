@@ -1373,7 +1373,10 @@ resize_stream(Gif_Stream* gfs,
         sctx_init(&sctx, gfs, nw, nh);
         sctx.scale_colors = scale_colors;
 
+        set_progress_state(Scaling);
+
         for (sctx.imageno = 0; sctx.imageno < gfs->nimages; ++sctx.imageno) {
+            on_progress(6);
             sctx.gfi = gfs->images[sctx.imageno];
             scale_image(&sctx, method);
         }

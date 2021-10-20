@@ -11,6 +11,7 @@
 #define GIFSICLE_H
 #include <lcdfgif/gif.h>
 #include <lcdf/clp.h>
+#include "progress.h"
 #ifdef __GNUC__
 #define NORETURN __attribute__ ((noreturn))
 #define USED_ATTR __attribute__ ((used))

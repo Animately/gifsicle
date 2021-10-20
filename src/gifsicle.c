@@ -998,6 +998,8 @@ merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, ui
   out = merge_frame_interval(frames, f1, f2, &active_output_data,
                              compress_immediately, &huge_stream);
 
+  printf("finished merge \n");
+
   if (out) {
     double w, h;
     if (active_output_data.scaling == GT_SCALING_SCALE) {
@@ -1011,14 +1013,22 @@ merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, ui
       resize_stream(out, w, h, active_output_data.resize_flags,
                     active_output_data.scale_method,
                     active_output_data.scale_colors);
+    printf("finished resize \n");
     if (colormap_change)
       do_colormap_change(out);
+      printf("finished colormap change \n");
     if (output_transforms)
       apply_color_transforms(output_transforms, out);
+      printf("finished colormap transform \n");
     if (active_output_data.optimizing & GT_OPT_MASK)
       optimize_fragments(out, active_output_data.optimizing, huge_stream);
+      printf("finished optimization \n");
+
+    printf("write stream \n");
 
     write_stream(outfile, out, buffer, size);
+
+    printf("finished write stream \n");
 
     Gif_DeleteStream(out);
   }
@@ -2166,6 +2176,8 @@ particular purpose.\n");
 
   if ((mode == MERGING && !error_count) || mode == INFOING)
     output_frames(output_buffer, output_size);
+
+  set_progress_state(Finished);
 
   verbose_endline();
   print_useless_options("frame", next_frame, frame_option_types);

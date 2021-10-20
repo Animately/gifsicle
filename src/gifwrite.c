@@ -19,6 +19,7 @@
 #include <string.h>
 #include <assert.h>
 #include <limits.h>
+#include "progress.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1053,9 +1054,15 @@ write_gif(Gif_Stream *gfs, Gif_Writer *grr)
   if (gfs->loopcount > -1)
     write_netscape_loop_extension(gfs->loopcount, grr);
 
+  set_progress_state(Writing);
+  adjust_progress(gfs->nimages);
+  
   for (i = 0; i < gfs->nimages; i++)
+  {
+    on_progress(1);
     if (!Gif_IncrementalWriteImage(grr, gfs, gfs->images[i]))
       goto done;
+  }
 
   for (gfex = gfs->end_extension_list; gfex; gfex = gfex->next)
     write_generic_extension(gfex, grr);

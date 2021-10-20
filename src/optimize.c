@@ -459,9 +459,13 @@ optimize_fragments(Gif_Stream *gfs, int optimize_flags, int huge_stream)
         finalize_optimizer_data32();
     } else {
         create_subimages16(gfs, optimize_flags, !huge_stream);
+        printf("subimages \n");
         create_out_global_map16(gfs);
+        printf("out global \n");
         create_new_image_data16(gfs, optimize_flags);
+        printf("new image \n");
         finalize_optimizer_data16();
+        printf("finalize \n");
     }
     finalize_optimizer(gfs, optimize_flags);
 }
