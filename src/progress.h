@@ -16,10 +16,11 @@ extern "C" {
 
 void on_progress(int index);
 
+void add_image_height(unsigned int image_height);
 void set_images_count(unsigned int images_count);
 void set_progress_state(enum ProgressState progress_state);
 void adjust_progress(unsigned int images_count);
-int is_optimize();
+int optimize_hard();
 
 #ifdef __cplusplus
 }
@@ -28,7 +29,6 @@ int is_optimize();
 #ifdef __cplusplus
 
 #include <functional>
-#include <map>
 
 #include "utility.h"
 
@@ -41,12 +41,11 @@ public:
     void setOnProgress(std::function<void(int)> on_progress);
     void setProgressState(ProgressState progress_state);
     
+    void addImageHeight(unsigned int image_height);
     void applyOptions(const GifOptions& options);
     void adjustProgress(unsigned int images_count);
     void onProgress(int index);
-    bool isOptimize() const;
-
-    std::map<int, int> data;
+    bool isOptimizeHard() const;
 
 private:
     ProgressManager();
@@ -56,12 +55,13 @@ private:
     unsigned int m_states_count;
     unsigned int m_images_count;
     unsigned int m_total_count;
+    unsigned int m_height_scale;
     float m_current_count;
     float m_progress;
     float m_progress_step;
+    bool m_optimize_hard;
     ProgressState m_progress_state;
     std::function<void(int)> m_on_progress;
-    bool m_is_optimize;
 };
 
 #endif

@@ -22,12 +22,7 @@ val compress(const std::uintptr_t data, const std::size_t size, const GifOptions
 
     GifBuffer buffer;
     const auto status = gifsicle_main(options.count(), options.options(), 
-                                      input_buffer, size, &buffer.data, &buffer.size);
-
-    for (const auto[index, count] : ProgressManager::instance().data)
-    {
-        std::cout << index << " " << count << std::endl;
-    }    
+                                      input_buffer, size, &buffer.data, &buffer.size);  
 
     if (!buffer.data || status != 0) 
         return val::null();

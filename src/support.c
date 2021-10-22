@@ -1560,12 +1560,10 @@ merge_frame_interval(Gt_Frameset *fset, int f1, int f2,
     dest->loopcount = output_data->loopcount;
   dest->screen_width = dest->screen_height = 0;
 
-  set_images_count(nmerger);
   set_progress_state(Merging);
 
   /** ACTUALLY MERGE FRAMES INTO THE NEW STREAM **/
   for (i = 0; i < nmerger; i++) {
-    on_progress(5);
     Gt_Frame *fr = merger[i];
     Gif_Image *srci;
     Gif_Image *desti;

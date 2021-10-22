@@ -998,6 +998,18 @@ merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, ui
   out = merge_frame_interval(frames, f1, f2, &active_output_data,
                              compress_immediately, &huge_stream);
 
+  set_images_count(out->nimages);
+
+  if (optimize_hard()) {
+    for (int i = 0; i < out->nimages; ++i) {
+      Gif_Image *cur_gfi = out->images[i];
+      int top = constrain(0, cur_gfi->top, out->screen_height);
+      int height = constrain(0, cur_gfi->top + cur_gfi->height, out->screen_height) - top;
+
+      add_image_height(height);
+    }
+  }
+
   printf("finished merge \n");
 
   if (out) {
