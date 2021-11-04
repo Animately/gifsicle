@@ -544,6 +544,7 @@ explode_filename(const char *filename, int number, const char *name, int max_nim
 
 int frame_spec_1;
 int frame_spec_2;
+int frame_percent;
 char *frame_spec_name;
 int dimensions_x;
 int dimensions_y;
@@ -577,6 +578,15 @@ parse_frame_spec(Clp_Parser *clp, const char *arg, int complain, void *thunk)
   }
   arg++;
   c = (char *)arg;
+
+  if (c[0] == '%') {
+    frame_spec_1 = 0;
+    int images_count = Gif_ImageCount(input);
+    frame_spec_2 = images_count;
+    c++;
+    frame_percent = strtol(c, &c, 10);
+    return 1;
+  }
 
   /* Get a number range (#x, #x-y, or #x-). First, read x. */
   if (isdigit(c[0]))

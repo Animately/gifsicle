@@ -1010,8 +1010,6 @@ merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, ui
     }
   }
 
-  printf("finished merge \n");
-
   if (out) {
     double w, h;
     if (active_output_data.scaling == GT_SCALING_SCALE) {
@@ -1025,22 +1023,14 @@ merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, ui
       resize_stream(out, w, h, active_output_data.resize_flags,
                     active_output_data.scale_method,
                     active_output_data.scale_colors);
-    printf("finished resize \n");
     if (colormap_change)
       do_colormap_change(out);
-      printf("finished colormap change \n");
     if (output_transforms)
       apply_color_transforms(output_transforms, out);
-      printf("finished colormap transform \n");
     if (active_output_data.optimizing & GT_OPT_MASK)
       optimize_fragments(out, active_output_data.optimizing, huge_stream);
-      printf("finished optimization \n");
-
-    printf("write stream \n");
 
     write_stream(outfile, out, buffer, size);
-
-    printf("finished write stream \n");
 
     Gif_DeleteStream(out);
   }
@@ -1172,9 +1162,13 @@ frame_argument(Clp_Parser *clp, const char *arg)
   if (val == -97)
     return 0;
   else if (val > 0) {
-    int i, delta = (frame_spec_1 <= frame_spec_2 ? 1 : -1);
-    for (i = frame_spec_1; i != frame_spec_2 + delta; i += delta)
-      show_frame(i, frame_spec_name != 0);
+    if (frame_percent == 0)
+      return 1;
+    for (int i = frame_spec_1; i < frame_spec_2; i++) {
+        if ((i * frame_percent / 100) > ((i - 1) * frame_percent / 100)) {
+          show_frame(i, frame_spec_name != 0);
+        }
+    }
     if (next_output)
       combine_output_options();
     return 1;

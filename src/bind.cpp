@@ -40,5 +40,6 @@ EMSCRIPTEN_BINDINGS(GifSicle)
         .field("optimize", &GifOptions::optimize)
         .field("scaleX", &GifOptions::scale_x)
         .field("scaleY", &GifOptions::scale_y)
-        .field("colors", &GifOptions::colors);
+        .field("colors", &GifOptions::colors)
+        .field("reduceFrames", &GifOptions::reduce_frames);
 }

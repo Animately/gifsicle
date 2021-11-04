@@ -295,6 +295,7 @@ void    colormap_stream(Gif_Stream*, Gif_Colormap*, Gt_OutputData*);
  **/
 extern int      frame_spec_1;
 extern int      frame_spec_2;
+extern int      frame_percent;
 extern char *   frame_spec_name;
 extern int      dimensions_x;
 extern int      dimensions_y;

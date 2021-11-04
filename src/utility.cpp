@@ -87,6 +87,9 @@ bool parse_options(const GifOptions& gif_options, COptions& options)
     const auto colors_value = value(gif_options.colors);
     options.add_option("--colors", colors_value.c_str());
 
+    const auto reduce_value = "#%" + value(gif_options.reduce_frames);
+    options.add_option("--delete", reduce_value.c_str());
+
     return true;
 }
 
