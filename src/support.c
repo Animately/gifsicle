@@ -1652,6 +1652,8 @@ merge_frame_interval(Gt_Frameset *fset, int f1, int f2,
 
     if (fr->delay >= 0)
       desti->delay = fr->delay;
+    if (frame_percent != 0) 
+      desti->delay = desti->delay * 100 / (100 - frame_percent);
     if (fr->disposal >= 0)
       desti->disposal = fr->disposal;
 
