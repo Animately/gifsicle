@@ -3,9 +3,9 @@
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
 
-#include "utility.h"
-#include "gifsicle.h"
-#include "progress.h"
+#include <utility.h>
+#include <gifsicle.h>
+#include <progress.h>
 
 using namespace emscripten;
 
@@ -21,8 +21,12 @@ val compress(const std::uintptr_t data, const std::size_t size, const GifOptions
     const auto* input_buffer = reinterpret_cast<const uint8_t*>(data);
 
     GifBuffer buffer;
+    auto start = std::chrono::system_clock::now();
     const auto status = gifsicle_main(options.count(), options.options(), 
                                       input_buffer, size, &buffer.data, &buffer.size);  
+    auto end = std::chrono::system_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+    std::cout << elapsed.count() << std::endl;
 
     if (!buffer.data || status != 0) 
         return val::null();

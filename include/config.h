@@ -10,6 +10,10 @@
 /* Define to the number of arguments to gettimeofday. */
 /* #undef GETTIMEOFDAY_PROTO */
 
+#ifndef __EMSCRIPTEN__
+#define GETTIMEOFDAY_PROTO 2
+#endif
+
 /* Define if GIF LZW compression is off. */
 /* #undef GIF_UNGIF */
 
@@ -25,6 +29,10 @@
 /* Define to 1 if you have the <memory.h> header file. */
 /* #undef HAVE_MEMORY_H */
 
+#ifndef __EMSCRIPTEN__
+#define HAVE_MEMORY_H 1
+#endif
+
 /* Define to 1 if you have the `mkstemp' function. */
 #define HAVE_MKSTEMP 1
 
@@ -34,11 +42,23 @@
 /* Define to 1 if SIMD types should be used. */
 /* #undef HAVE_SIMD */
 
+#ifndef __EMSCRIPTEN__
+#define HAVE_SIMD 1
+#endif
+
 /* Define to 1 if you have the <stdint.h> header file. */
 /* #undef HAVE_STDINT_H */
 
+#ifndef __EMSCRIPTEN__
+#define HAVE_STDINT_H 1
+#endif
+
 /* Define to 1 if you have the <stdlib.h> header file. */
 /* #undef HAVE_STDLIB_H */
+
+#ifndef __EMSCRIPTEN__
+#define HAVE_STDLIB_H 1
+#endif
 
 /* Define to 1 if you have the `strerror' function. */
 #define HAVE_STRERROR 1
@@ -46,8 +66,16 @@
 /* Define to 1 if you have the <strings.h> header file. */
 /* #undef HAVE_STRINGS_H */
 
+#ifndef __EMSCRIPTEN__
+#define HAVE_STRINGS_H 1
+#endif
+
 /* Define to 1 if you have the <string.h> header file. */
 /* #undef HAVE_STRING_H */
+
+#ifndef __EMSCRIPTEN__
+#define HAVE_STRING_H 1
+#endif
 
 /* Define to 1 if you have the `strtoul' function. */
 #define HAVE_STRTOUL 1
@@ -61,11 +89,19 @@
 /* Define to 1 if you have the <sys/time.h> header file. */
 /* #undef HAVE_SYS_TIME_H */
 
+#ifndef __EMSCRIPTEN__
+#define HAVE_SYS_TIME_H 1
+#endif
+
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <time.h> header file. */
 /* #undef HAVE_TIME_H */
+
+#ifndef __EMSCRIPTEN__
+#define HAVE_TIME_H 1
+#endif
 
 /* Define to 1 if the system has the type `uint64_t'. */
 #define HAVE_UINT64_T 1
@@ -81,6 +117,10 @@
 
 /* Define to 1 if `vector_size' vector types are usable. */
 /* #undef HAVE_VECTOR_SIZE_VECTOR_TYPES */
+
+#ifndef __EMSCRIPTEN__
+#define HAVE_VECTOR_SIZE_VECTOR_TYPES 1
+#endif
 
 /* Define to 1 if you have the `__builtin_shufflevector' function. */
 /* #undef HAVE___BUILTIN_SHUFFLEVECTOR */
@@ -125,19 +165,32 @@
 #define SIZEOF_UNSIGNED_INT 4
 
 /* The size of `unsigned long', as computed by sizeof. */
+#ifdef __EMSCRIPTEN__
 #define SIZEOF_UNSIGNED_LONG 4
+#else
+#define SIZEOF_UNSIGNED_LONG 8
+#endif
 
 /* The size of `void *', as computed by sizeof. */
+#ifdef __EMSCRIPTEN__
 #define SIZEOF_VOID_P 4
+#else
+#define SIZEOF_VOID_P 8
+#endif
 
 /* Define to 1 if you have the ANSI C header files. */
 /* #undef STDC_HEADERS */
+#ifndef __EMSCRIPTEN__
+#define STDC_HEADERS 1
+#endif
 
 /* Version number of package */
 #define VERSION "1.93"
 
 /* Define if X is not available. */
+#ifdef __EMSCRIPTEN__
 #define X_DISPLAY_MISSING 1
+#endif
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

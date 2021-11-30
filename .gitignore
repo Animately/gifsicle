@@ -1,4 +1,5 @@
 build/
+build-wasm/
 server/
 .vscode/
 *.wasm

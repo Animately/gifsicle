@@ -1,6 +1,7 @@
-#include "utility.h"
+#include <utility.h>
 
 #include <stdio.h>
+#include <cstring>
 #include <lcdfgif/gif.h>
 
 constexpr auto options_capacity = 20;
