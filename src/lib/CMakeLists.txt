@@ -1,4 +1,4 @@
-set(TARGET_NAME gifsicle)
+set(TARGET_NAME gifsiclelib)
 
 set(SOURCES
     clp.c

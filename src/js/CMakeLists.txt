@@ -1,4 +1,4 @@
-set(TARGET_NAME animately_gif)
+set(TARGET_NAME gifsicle)
 
 set(SOURCES
     bind.cpp
@@ -14,4 +14,4 @@ if(EMSCRIPTEN)
     set_target_properties(${TARGET_NAME} PROPERTIES LINK_FLAGS ${GIFSICLE_EMCC_FLAGS})
 endif()
 
-target_link_libraries(${TARGET_NAME} PUBLIC gifsicle)
+target_link_libraries(${TARGET_NAME} PUBLIC gifsiclelib)
