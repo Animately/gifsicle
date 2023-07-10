@@ -6,7 +6,7 @@
 
 constexpr auto options_capacity = 20;
 
-COptions::COptions() 
+COptions::COptions()
     : m_count(0)
     , m_capacity(options_capacity)
     , mp_options(new char*[options_capacity])
@@ -15,9 +15,9 @@ COptions::COptions()
 
 COptions::~COptions()
 {
-    if (mp_options) 
+    if (mp_options)
     {
-        for (size_t i = 0; i < m_capacity; ++i)
+        for (size_t i = 0; i < m_count; ++i)
         {
             if (mp_options[i])
                 delete[] mp_options[i];

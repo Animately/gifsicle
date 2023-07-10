@@ -676,9 +676,9 @@ close_giffile(FILE *f, int final)
 }
 
 void
-input_stream(const char *name, const uint8_t* buffer, size_t size)
+input_stream(const char *name, Gif_Stream *stream)
 {
-  if (!buffer)
+  if (!stream)
     return;
 
   char* component_namebuf;
@@ -708,8 +708,7 @@ input_stream(const char *name, const uint8_t* buffer, size_t size)
   /* read file */
   {
     int old_error_count = error_count;
-    gfs = Gif_FullReadBuffer(buffer, size, gif_read_flags | GIF_READ_COMPRESSED,
-                           name, gifread_error);
+    gfs = stream;
     if ((!gfs || (Gif_ImageCount(gfs) == 0 && gfs->errors > 0))
         && componentno != 1)
       lerror(name, "trailing garbage ignored");
@@ -804,8 +803,6 @@ input_stream(const char *name, const uint8_t* buffer, size_t size)
   apply_color_transforms(input_transforms, gfs);
   gfs->refcount++;
 
-  /* Read more files. */
-  free(component_namebuf);
   return;
 
  error:
@@ -1448,7 +1445,7 @@ error:
  **/
 
 int
-gifsicle_main(int argc, char *argv[], const uint8_t* buffer, size_t size, uint8_t** output_buffer, uint32_t* output_size)
+gifsicle_main(int argc, char *argv[], Gif_Stream* stream, uint8_t** output_buffer, uint32_t* output_size)
 {
   /* Check SIZEOF constants (useful for Windows). If these assertions fail,
      you've used the wrong Makefile. You should've used Makefile.w32 for
@@ -2151,7 +2148,7 @@ particular purpose.\n");
      case Clp_NotOption:
       if (clp->vstr[0] != '#' || !frame_argument(clp, clp->vstr)) {
         input_done();
-        input_stream(clp->vstr, buffer, size);
+        input_stream(clp->vstr, stream);
       }
       break;
 
@@ -2175,7 +2172,7 @@ particular purpose.\n");
   if (next_output)
     combine_output_options();
   if (!files_given)
-    input_stream(0, NULL, 0);
+    input_stream(0, NULL);
 
   frame_change_done();
   input_done();

@@ -33,7 +33,7 @@ void ProgressManager::setProgressState(ProgressState progress_state)
 {
     m_progress_state = progress_state;
 
-    if (m_progress_state == Finished)
+    if (m_progress_state == Finished && m_on_progress)
         m_on_progress(100);
 }
 
@@ -45,7 +45,7 @@ void ProgressManager::applyOptions(const GifOptions& options)
 
     if (options.optimize > 1)
         m_optimize_hard = true;
-    
+
     m_states_count = states_count;
     m_height_scale = options.scale_y;
 }
@@ -55,7 +55,7 @@ void ProgressManager::onProgress(int index)
     m_current_count += m_progress_step;
     const auto percent = m_current_count / static_cast<float>(m_total_count) * 100.f;
 
-    if (round(percent - m_progress) >= 1.f && percent <= 100.f)
+    if (round(percent - m_progress) >= 1.f && percent <= 100.f && m_on_progress)
     {
         m_progress = percent;
         m_on_progress(round(m_progress));
