@@ -566,7 +566,7 @@ parse_frame_spec(Clp_Parser *clp, const char *arg, int complain, void *thunk)
   frame_spec_name = 0;
 
   if (!input && !input_name)
-    input_stream(0, NULL, 0);
+    input_stream(0, NULL);
   if (!input)
     return 0;
 
@@ -1652,7 +1652,7 @@ merge_frame_interval(Gt_Frameset *fset, int f1, int f2,
 
     if (fr->delay >= 0)
       desti->delay = fr->delay;
-    if (frame_percent != 0) 
+    if (frame_percent != 0)
       desti->delay = desti->delay * 100 / (100 - frame_percent);
     if (fr->disposal >= 0)
       desti->disposal = fr->disposal;

@@ -6,6 +6,7 @@
 #include <utility.h>
 #include <gifsicle.h>
 #include <progress.h>
+#include <serialization/binary.h>
 
 using namespace emscripten;
 
@@ -18,24 +19,19 @@ val compress(const std::uintptr_t data, const std::size_t size, const GifOptions
     ProgressManager::instance().setOnProgress([on_progress](const auto value) { on_progress(value); });
     ProgressManager::instance().applyOptions(gif_options);
 
-    const auto* input_buffer = reinterpret_cast<const uint8_t*>(data);
+    auto* gif{deserialize(reinterpret_cast<const uint8_t*>(data), size)};
 
     GifBuffer buffer;
-    auto start = std::chrono::system_clock::now();
-    const auto status = gifsicle_main(options.count(), options.options(), 
-                                      input_buffer, size, &buffer.data, &buffer.size);  
-    auto end = std::chrono::system_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - start);
-    std::cout << elapsed.count() << std::endl;
+    const auto status{gifsicle_main(options.count(), options.options(), gif, &buffer.data, &buffer.size)};
 
-    if (!buffer.data || status != 0) 
+    if (!buffer.data || status != 0)
         return val::null();
-    
-    const auto Uint8ClampedArray = val::global("Uint8ClampedArray");
+
+    const auto Uint8ClampedArray{val::global("Uint8ClampedArray")};
     return Uint8ClampedArray.new_(typed_memory_view(buffer.size, buffer.data));
 }
 
-EMSCRIPTEN_BINDINGS(GifSicle) 
+EMSCRIPTEN_BINDINGS(GifSicle)
 {
     function("compress", &compress);
 

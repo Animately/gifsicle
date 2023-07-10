@@ -33,7 +33,7 @@ extern pthread_mutex_t kd3_sort_lock;
 extern "C" {
 #endif
 
-int gifsicle_main(int argc, char *argv[], const uint8_t* buffer, size_t size, uint8_t** output_buffer, uint32_t* output_size);
+int gifsicle_main(int argc, char *argv[], Gif_Stream* stream, uint8_t** output_buffer, uint32_t* output_size);
 
 #ifdef __cplusplus
 }
@@ -317,7 +317,7 @@ int             parse_two_colors(Clp_Parser *, const char *, int, void *);
 extern Gif_Stream *input;
 extern const char *input_name;
 
-void            input_stream(const char *, const uint8_t*, size_t);
+void            input_stream(const char *, Gif_Stream*);
 void            input_done(void);
 void            output_frames(uint8_t**, uint32_t*);
 
