@@ -676,12 +676,10 @@ close_giffile(FILE *f, int final)
 }
 
 void
-input_stream(const char *name, Gif_Stream *stream)
+input_stream(const char *name)
 {
-  if (!stream)
-    return;
-
   char* component_namebuf;
+  FILE *f;
   Gif_Stream *gfs;
   int i;
   int saved_next_frame = next_frame;
@@ -700,7 +698,36 @@ input_stream(const char *name, Gif_Stream *stream)
 
   set_mode(BLANK_MODE);
 
+  f = open_giffile(name);
+  if (!f)
+    return;
+  if (f == stdin) {
+    name = "<stdin>";
+    input_name = 0;
+  }
   main_name = name;
+
+ retry_file:
+  /* change filename for component files */
+  componentno++;
+  if (componentno > 1) {
+    size_t namelen = strlen(main_name) + 10;
+    component_namebuf = (char*) malloc(namelen);
+    snprintf(component_namebuf, namelen, "%s~%d", main_name, componentno);
+    name = component_namebuf;
+  } else
+    component_namebuf = 0;
+
+  /* check for empty file */
+  i = getc(f);
+  if (i == EOF) {
+    if (!(gif_read_flags & GIF_READ_TRAILING_GARBAGE_OK))
+      lerror(name, "empty file");
+    else if (nextfile)
+      lerror(name, "no more images in file");
+    goto error;
+  }
+  ungetc(i, f);
 
   if (verbosing)
     verbose_open('<', name);
@@ -708,7 +735,8 @@ input_stream(const char *name, Gif_Stream *stream)
   /* read file */
   {
     int old_error_count = error_count;
-    gfs = stream;
+    gfs = Gif_FullReadFile(f, gif_read_flags | GIF_READ_COMPRESSED,
+                           name, gifread_error);
     if ((!gfs || (Gif_ImageCount(gfs) == 0 && gfs->errors > 0))
         && componentno != 1)
       lerror(name, "trailing garbage ignored");
@@ -803,10 +831,16 @@ input_stream(const char *name, Gif_Stream *stream)
   apply_color_transforms(input_transforms, gfs);
   gfs->refcount++;
 
+  /* Read more files. */
+  free(component_namebuf);
+  if ((gif_read_flags & GIF_READ_TRAILING_GARBAGE_OK) && !nextfile)
+    goto retry_file;
+  close_giffile(f, 0);
   return;
 
  error:
   free(component_namebuf);
+  close_giffile(f, 1);
 }
 
 void
@@ -822,7 +856,7 @@ input_done(void)
   if (mode == DELETING)
     frame_change_done();
   if (mode == BATCHING || mode == EXPLODING)
-    output_frames(NULL, NULL);
+    output_frames();
 }
 
 
@@ -923,17 +957,6 @@ do_colormap_change(Gif_Stream *gfs)
  * output GIF images
  **/
 
-#if 1
-
-static void
-write_stream(const char *output_name, Gif_Stream *gfs, uint8_t** data_buffer, uint32_t* size)
-{
-  Gif_FullWriteFile(gfs, &gif_write_info, NULL, data_buffer, size);
-  any_output_successful = 1;
-}
-
-#else
-
 static void
 write_stream(const char *output_name, Gif_Stream *gfs)
 {
@@ -967,10 +990,8 @@ write_stream(const char *output_name, Gif_Stream *gfs)
     lerror(output_name, "%s", strerror(errno));
 }
 
-#endif
-
 static void
-merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, uint32_t* size)
+merge_and_write_frames(const char *outfile, int f1, int f2)
 {
   Gif_Stream *out;
   int compress_immediately;
@@ -995,18 +1016,6 @@ merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, ui
   out = merge_frame_interval(frames, f1, f2, &active_output_data,
                              compress_immediately, &huge_stream);
 
-  set_images_count(out->nimages);
-
-  if (optimize_hard()) {
-    for (int i = 0; i < out->nimages; ++i) {
-      Gif_Image *cur_gfi = out->images[i];
-      int top = constrain(0, cur_gfi->top, out->screen_height);
-      int height = constrain(0, cur_gfi->top + cur_gfi->height, out->screen_height) - top;
-
-      add_image_height(height);
-    }
-  }
-
   if (out) {
     double w, h;
     if (active_output_data.scaling == GT_SCALING_SCALE) {
@@ -1026,9 +1035,7 @@ merge_and_write_frames(const char *outfile, int f1, int f2, uint8_t** buffer, ui
       apply_color_transforms(output_transforms, out);
     if (active_output_data.optimizing & GT_OPT_MASK)
       optimize_fragments(out, active_output_data.optimizing, huge_stream);
-
-    write_stream(outfile, out, buffer, size);
-
+    write_stream(outfile, out);
     Gif_DeleteStream(out);
   }
 
@@ -1078,7 +1085,7 @@ output_information(const char *outfile)
 }
 
 void
-output_frames(uint8_t** buffer, uint32_t* size)
+output_frames(void)
 {
   /* Use the current output name, not the stored output name.
      This supports 'gifsicle a.gif -o xxx'.
@@ -1098,7 +1105,7 @@ output_frames(uint8_t** buffer, uint32_t* size)
      case MERGING:
      case BATCHING:
      case INFOING:
-      merge_and_write_frames(outfile, 0, -1, buffer, size);
+      merge_and_write_frames(outfile, 0, -1);
       break;
 
      case EXPLODING: {
@@ -1126,7 +1133,7 @@ output_frames(uint8_t** buffer, uint32_t* size)
 
          explodename = explode_filename(outfile, imagenumber, imagename,
                                         max_nimages);
-         merge_and_write_frames(explodename, i, i, NULL, NULL);
+         merge_and_write_frames(explodename, i, i);
        }
        break;
      }
@@ -1159,13 +1166,9 @@ frame_argument(Clp_Parser *clp, const char *arg)
   if (val == -97)
     return 0;
   else if (val > 0) {
-    if (frame_percent == 0)
-      return 1;
-    for (int i = frame_spec_1; i < frame_spec_2; i++) {
-        if ((i * frame_percent / 100) > ((i - 1) * frame_percent / 100)) {
-          show_frame(i, frame_spec_name != 0);
-        }
-    }
+    int i, delta = (frame_spec_1 <= frame_spec_2 ? 1 : -1);
+    for (i = frame_spec_1; i != frame_spec_2 + delta; i += delta)
+      show_frame(i, frame_spec_name != 0);
     if (next_output)
       combine_output_options();
     return 1;
@@ -1445,7 +1448,7 @@ error:
  **/
 
 int
-gifsicle_main(int argc, char *argv[], Gif_Stream* stream, uint8_t** output_buffer, uint32_t* output_size)
+gifsicle_main(int argc, const char *argv[])
 {
   /* Check SIZEOF constants (useful for Windows). If these assertions fail,
      you've used the wrong Makefile. You should've used Makefile.w32 for
@@ -2148,7 +2151,7 @@ particular purpose.\n");
      case Clp_NotOption:
       if (clp->vstr[0] != '#' || !frame_argument(clp, clp->vstr)) {
         input_done();
-        input_stream(clp->vstr, stream);
+        input_stream(clp->vstr);
       }
       break;
 
@@ -2172,15 +2175,12 @@ particular purpose.\n");
   if (next_output)
     combine_output_options();
   if (!files_given)
-    input_stream(0, NULL);
+    input_stream(0);
 
   frame_change_done();
   input_done();
-
   if ((mode == MERGING && !error_count) || mode == INFOING)
-    output_frames(output_buffer, output_size);
-
-  set_progress_state(Finished);
+    output_frames();
 
   verbose_endline();
   print_useless_options("frame", next_frame, frame_option_types);

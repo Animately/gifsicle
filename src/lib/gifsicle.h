@@ -11,7 +11,6 @@
 #define GIFSICLE_H
 #include <lcdfgif/gif.h>
 #include <lcdf/clp.h>
-#include "progress.h"
 #ifdef __GNUC__
 #define NORETURN __attribute__ ((noreturn))
 #define USED_ATTR __attribute__ ((used))
@@ -27,16 +26,6 @@ typedef struct Gt_ColorTransform Gt_ColorTransform;
 #if ENABLE_THREADS
 #include <pthread.h>
 extern pthread_mutex_t kd3_sort_lock;
-#endif
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int gifsicle_main(int argc, char *argv[], Gif_Stream* stream, uint8_t** output_buffer, uint32_t* output_size);
-
-#ifdef __cplusplus
-}
 #endif
 
 typedef struct Gt_Frame {
@@ -295,7 +284,6 @@ void    colormap_stream(Gif_Stream*, Gif_Colormap*, Gt_OutputData*);
  **/
 extern int      frame_spec_1;
 extern int      frame_spec_2;
-extern int      frame_percent;
 extern char *   frame_spec_name;
 extern int      dimensions_x;
 extern int      dimensions_y;
@@ -317,9 +305,9 @@ int             parse_two_colors(Clp_Parser *, const char *, int, void *);
 extern Gif_Stream *input;
 extern const char *input_name;
 
-void            input_stream(const char *, Gif_Stream*);
+void            input_stream(const char *);
 void            input_done(void);
-void            output_frames(uint8_t**, uint32_t*);
+void            output_frames(void);
 
 /*****
  * stuff with frames

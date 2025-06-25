@@ -469,8 +469,6 @@ X(create_subimages)(Gif_Stream *gfs, int optimize_flags, int save_uncompressed)
   X(erase_screen)(X(this_data));
   last_gfi = 0;
 
-  set_progress_state(Optimizing);
-
   /* PRECONDITION:
      previous_data -- garbage
      last_data -- optimized image after disposal of previous optimized frame
@@ -478,7 +476,6 @@ X(create_subimages)(Gif_Stream *gfs, int optimize_flags, int save_uncompressed)
      next_data -- input image after application of current input frame,
                   if next_image_valid */
   for (image_index = 0; image_index < gfs->nimages; image_index++) {
-    on_progress(2);
     Gif_Image *gfi = gfs->images[image_index];
     Gif_OptData *subimage = new_opt_data();
     if (gfi->local)
@@ -717,15 +714,13 @@ X(create_out_global_map)(Gif_Stream *gfs)
    No funkiness, no transparency, nothing */
 
 static void
-X(simple_frame_data)(Gif_Image *gfi, uint8_t *map, int progress)
+X(simple_frame_data)(Gif_Image *gfi, uint8_t *map)
 {
   Gif_OptBounds ob = safe_bounds(gfi);
   int x, y;
   unsigned scan_width = gfi->width;
 
   for (y = 0; y < ob.height; y++) {
-      if (progress)
-        on_progress(8);
       palindex_type *from = X(this_data) + (unsigned) screen_width * (y + ob.top) + ob.left;
       uint8_t *into = gfi->image_data + y * scan_width;
       for (x = 0; x < ob.width; x++)
@@ -742,7 +737,6 @@ X(transp_frame_data)(Gif_Stream *gfs, Gif_Image *gfi, uint8_t *map,
                      int optimize_flags, Gif_CompressInfo *gcinfo)
 {
   Gif_OptBounds ob = safe_bounds(gfi);
-
   int x, y, transparent = gfi->transparent;
   palindex_type *last = 0;
   palindex_type *cur = 0;
@@ -752,7 +746,7 @@ X(transp_frame_data)(Gif_Stream *gfs, Gif_Image *gfi, uint8_t *map,
 
   /* First, try w/o transparency. Compare this to the result using
      transparency and pick the better of the two. */
-  X(simple_frame_data)(gfi, map, 0);
+  X(simple_frame_data)(gfi, map);
   Gif_FullCompressImage(gfs, gfi, gcinfo);
   gcinfo->flags |= GIF_WRITE_SHRINK;
 
@@ -799,8 +793,6 @@ X(transp_frame_data)(Gif_Stream *gfs, Gif_Image *gfi, uint8_t *map,
     nsame = 0;
 
     for (y = 0; y < ob.height; ++y) {
-        if (optimize_hard())
-          on_progress(7);
         last = X(last_data) + (unsigned) screen_width * (y + ob.top) + ob.left;
         cur = X(this_data) + (unsigned) screen_width * (y + ob.top) + ob.left;
         for (x = 0; x < ob.width; ++x) {
@@ -881,7 +873,6 @@ X(create_new_image_data)(Gif_Stream *gfs, int optimize_flags)
   X(erase_screen)(X(this_data));
 
   for (image_index = 0; image_index < gfs->nimages; image_index++) {
-    on_progress(3);
     Gif_Image *cur_gfi = gfs->images[image_index];
     Gif_OptData *opt = (Gif_OptData *)cur_gfi->user_data;
     int was_compressed = (cur_gfi->img == 0);
@@ -892,7 +883,6 @@ X(create_new_image_data)(Gif_Stream *gfs, int optimize_flags)
             previous_data = Gif_NewArray(palindex_type, screen_size);
         X(copy_data_area)(previous_data, X(this_data), cur_gfi);
     }
-
 
     /* set up this_data to be equal to the current image */
     X(apply_frame)(X(this_data), gfs, cur_gfi, 0, 0);
@@ -922,7 +912,7 @@ X(create_new_image_data)(Gif_Stream *gfs, int optimize_flags)
           && cur_gfi->transparent >= 0)
           X(transp_frame_data)(gfs, cur_gfi, map, optimize_flags, &gcinfo);
       else
-          X(simple_frame_data)(cur_gfi, map, optimize_hard());
+          X(simple_frame_data)(cur_gfi, map);
 
       if (cur_gfi->img) {
         if (was_compressed || (optimize_flags & GT_OPT_MASK) > 1) {

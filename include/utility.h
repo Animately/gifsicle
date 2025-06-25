@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include <string>
+#include <cstdint>
 
 struct GifOptions
 {

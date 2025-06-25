@@ -16,8 +16,6 @@
 #include <assert.h>
 #include <errno.h>
 
-#include "progress.h"
-
 const char *program_name = "gifsicle";
 static int verbose_pos = 0;
 int error_count = 0;
@@ -291,8 +289,8 @@ const char* debug_color_str(const Gif_Color* gfc) {
     static int whichbuf = 0;
     static char buf[4][8];
     whichbuf = (whichbuf + 1) % 4;
-    sprintf(buf[whichbuf], "#%02X%02X%02X",
-            gfc->gfc_red, gfc->gfc_green, gfc->gfc_blue);
+    snprintf(buf[whichbuf], sizeof(buf[whichbuf]), "#%02X%02X%02X",
+             gfc->gfc_red, gfc->gfc_green, gfc->gfc_blue);
     return buf[whichbuf];
 }
 
@@ -522,16 +520,16 @@ explode_filename(const char *filename, int number, const char *name, int max_nim
   Gif_Delete(s);
   s = Gif_NewArray(char, l + 3);
   if (name)
-    sprintf(s, "%s.%s", filename, name);
+    snprintf(s, l + 3, "%s.%s", filename, name);
   else if (max_nimages <= 1000)
-    sprintf(s, "%s.%03d", filename, number);
+    snprintf(s, l + 3, "%s.%03d", filename, number);
   else {
     int digits;
     unsigned j;
     unsigned max = (max_nimages < 0 ? 0 : max_nimages);
     for (digits = 4, j = 10000; max > j; digits++)
       j *= 10;
-    sprintf(s, "%s.%0*d", filename, digits, number);
+    snprintf(s, l + 3, "%s.%0*d", filename, digits, number);
   }
 
   return s;
@@ -544,7 +542,6 @@ explode_filename(const char *filename, int number, const char *name, int max_nim
 
 int frame_spec_1;
 int frame_spec_2;
-int frame_percent;
 char *frame_spec_name;
 int dimensions_x;
 int dimensions_y;
@@ -566,7 +563,7 @@ parse_frame_spec(Clp_Parser *clp, const char *arg, int complain, void *thunk)
   frame_spec_name = 0;
 
   if (!input && !input_name)
-    input_stream(0, NULL);
+    input_stream(0);
   if (!input)
     return 0;
 
@@ -578,15 +575,6 @@ parse_frame_spec(Clp_Parser *clp, const char *arg, int complain, void *thunk)
   }
   arg++;
   c = (char *)arg;
-
-  if (c[0] == '%') {
-    frame_spec_1 = 0;
-    int images_count = Gif_ImageCount(input);
-    frame_spec_2 = images_count;
-    c++;
-    frame_percent = strtol(c, &c, 10);
-    return 1;
-  }
 
   /* Get a number range (#x, #x-y, or #x-). First, read x. */
   if (isdigit(c[0]))
@@ -1303,16 +1291,13 @@ handle_flip_and_screen(Gif_Stream* dest, Gif_Image* desti, Gt_Frame* fr)
 static void
 analyze_crop(int nmerger, Gt_Crop* crop, int compress_immediately)
 {
-  int i, nframes = 0;
-  int l = 0x7FFFFFFF, r = 0, t = 0x7FFFFFFF, b = 0;
+  int i, l = 0x7FFFFFFF, r = 0, t = 0x7FFFFFFF, b = 0;
   Gif_Stream* cropped_gfs = 0;
 
-  /* count frames to which this crop applies */
+  /* find cropped stream */
   for (i = 0; i < nmerger; i++)
-      if (merger[i]->crop == crop) {
+      if (merger[i]->crop == crop)
           cropped_gfs = merger[i]->stream;
-          nframes++;
-      }
 
   /* find border of frames */
   for (i = 0; i < nmerger; i++)
@@ -1570,8 +1555,6 @@ merge_frame_interval(Gt_Frameset *fset, int f1, int f2,
     dest->loopcount = output_data->loopcount;
   dest->screen_width = dest->screen_height = 0;
 
-  set_progress_state(Merging);
-
   /** ACTUALLY MERGE FRAMES INTO THE NEW STREAM **/
   for (i = 0; i < nmerger; i++) {
     Gt_Frame *fr = merger[i];
@@ -1652,8 +1635,6 @@ merge_frame_interval(Gt_Frameset *fset, int f1, int f2,
 
     if (fr->delay >= 0)
       desti->delay = fr->delay;
-    if (frame_percent != 0)
-      desti->delay = desti->delay * 100 / (100 - frame_percent);
     if (fr->disposal >= 0)
       desti->disposal = fr->disposal;
 

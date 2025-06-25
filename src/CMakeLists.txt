@@ -1,4 +1,2 @@
 add_subdirectory(lib)
-if(EMSCRIPTEN)
-    add_subdirectory(js)
-endif()
+add_subdirectory(shared)

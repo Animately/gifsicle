@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.14)
 set(TESTFILES
     main.cpp
     testutils.cpp
-    flatbufferstests.cpp
 )
 
 set(TEST_MAIN unit_tests)

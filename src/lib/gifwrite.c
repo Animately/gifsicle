@@ -8,6 +8,8 @@
    will, as long as this notice is kept intact and this source code is made
    available. There is no warranty, express or implied. */
 
+#include "progress.h"
+
 #if HAVE_CONFIG_H
 # include <config.h>
 #elif !defined(__cplusplus) && !defined(inline)
@@ -19,7 +21,6 @@
 #include <string.h>
 #include <assert.h>
 #include <limits.h>
-#include "progress.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -391,7 +392,7 @@ gfc_lookup_lossy_try_node(Gif_CodeTable *gfc, const Gif_Colormap *gfcm, Gif_Imag
     /* if the candidate pixel is good enough, check all possible continuations of that dictionary string */
     struct selected_node t = gfc_lookup_lossy(gfc, gfcm, gfi, pos+1, node, base_diff + diff, new_dither, max_diff);
 
-    /* search is biased towards finding longest candidate that is below treshold rather than a match with minimum average error */
+    /* search is biased towards finding longest candidate that is below threshold rather than a match with minimum average error */
     if (t.pos > best_t->pos || (t.pos == best_t->pos && t.diff < best_t->diff)) {
       *best_t = t;
     }
@@ -421,7 +422,7 @@ write_compressed_data(Gif_Stream *gfs, Gif_Image *gfi,
   unsigned pos;
   unsigned clear_bufpos, clear_pos;
   unsigned line_endpos;
-  const unsigned image_endpos = gfi->height * gfi->width;
+  const unsigned image_endpos = (size_t) gfi->height * (size_t) gfi->width;
   const uint8_t *imageline;
 
   unsigned run = 0;
@@ -1054,15 +1055,17 @@ write_gif(Gif_Stream *gfs, Gif_Writer *grr)
   if (gfs->loopcount > -1)
     write_netscape_loop_extension(gfs->loopcount, grr);
 
-  set_progress_state(Writing);
-  adjust_progress(gfs->nimages);
-  
+  set_images_count(gfs->nimages);
+
   for (i = 0; i < gfs->nimages; i++)
   {
-    on_progress(1);
     if (!Gif_IncrementalWriteImage(grr, gfs, gfs->images[i]))
       goto done;
+
+    on_progress(i);
   }
+
+  on_progress(gfs->nimages);
 
   for (gfex = gfs->end_extension_list; gfex; gfex = gfex->next)
     write_generic_extension(gfex, grr);
@@ -1079,18 +1082,11 @@ write_gif(Gif_Stream *gfs, Gif_Writer *grr)
 
 int
 Gif_FullWriteFile(Gif_Stream *gfs, const Gif_CompressInfo *gcinfo,
-                  FILE *f, uint8_t** buffer, uint32_t* size)
+                  FILE *f)
 {
   Gif_Writer grr;
   int ok = gif_writer_init(&grr, f, gcinfo)
            && write_gif(gfs, &grr);
-          
-  if (size) {
-    *buffer = grr.v;
-    *size = grr.pos;
-    grr.v = NULL;
-  }
-
   gif_writer_cleanup(&grr);
   return ok;
 }
@@ -1154,7 +1150,7 @@ Gif_CompressImage(Gif_Stream *gfs, Gif_Image *gfi)
 int
 Gif_WriteFile(Gif_Stream *gfs, FILE *f)
 {
-  return Gif_FullWriteFile(gfs, 0, f, NULL, NULL);
+  return Gif_FullWriteFile(gfs, 0, f);
 }
 
 

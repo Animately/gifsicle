@@ -6,6 +6,7 @@ set(SOURCES
     giffunc.c
     gifread.c
     gifunopt.c
+    gifsicle.c
     merge.c
     optimize.c
     quantize.c
@@ -15,8 +16,6 @@ set(SOURCES
     gifwrite.c
     progress.cpp
     utility.cpp
-
-    serialization/binary.cpp
 )
 
 add_library(${TARGET_NAME} ${SOURCES})

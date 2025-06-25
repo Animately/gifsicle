@@ -154,6 +154,7 @@ pipe_color_transformer(Gif_Colormap *gfcm, void *thunk)
   char *tmp_file = tmpnam(0);
 #endif
   char *new_command;
+  size_t new_command_sz;
 
 #ifdef HAVE_MKSTEMP
   {
@@ -167,11 +168,10 @@ pipe_color_transformer(Gif_Colormap *gfcm, void *thunk)
     fatal_error("can%,t create temporary file!");
 #endif
 
-  new_command = Gif_NewArray(char, strlen(command) + strlen(tmp_file) + 4);
-  sprintf(new_command, "%s  >%s", command, tmp_file);
-#ifndef __EMSCRIPTEN__
+  new_command_sz = strlen(command) + strlen(tmp_file) + 4;
+  new_command = Gif_NewArray(char, new_command_sz);
+  snprintf(new_command, new_command_sz, "%s  >%s", command, tmp_file);
   f = popen(new_command, "w");
-#endif
   if (!f)
     fatal_error("can%,t run color transformation command: %s", strerror(errno));
   Gif_DeleteArray(new_command);
@@ -326,7 +326,7 @@ rotate_image(Gif_Image* gfi, Gt_Frame* fr, int rotation)
   int width = gfi->width;
   int height = gfi->height;
   uint8_t **img = gfi->img;
-  uint8_t *new_data = Gif_NewArray(uint8_t, (unsigned) width * height);
+  uint8_t *new_data = Gif_NewArray(uint8_t, (unsigned) width * (unsigned) height);
   uint8_t *trav = new_data;
 
   /* this function can only rotate by 90 or 270 degrees */
@@ -392,7 +392,7 @@ static void kcscreen_init(kcscreen* kcs, Gif_Stream* gfs, int sw, int sh) {
     assert(!kcs->data && !kcs->scratch);
     kcs->width = sw <= 0 ? gfs->screen_width : sw;
     kcs->height = sh <= 0 ? gfs->screen_height : sh;
-    sz = (unsigned) kcs->width * kcs->height;
+    sz = kcs->width * kcs->height;
     kcs->data = Gif_NewArray(kacolor, sz);
     if ((gfs->nimages == 0 || gfs->images[0]->transparent < 0)
         && gfs->global && gfs->background < gfs->global->ncol) {
@@ -478,7 +478,7 @@ static void ksscreen_init(ksscreen* kss, Gif_Stream* gfs, int sw, int sh) {
     assert(!kss->data && !kss->scratch);
     kss->width = sw <= 0 ? gfs->screen_width : sw;
     kss->height = sh <= 0 ? gfs->screen_height : sh;
-    sz = (unsigned) kss->width * kss->height;
+    sz = kss->width * kss->height;
     kss->data = Gif_NewArray(scale_color, sz);
     if ((gfs->nimages == 0 || gfs->images[0]->transparent < 0)
         && gfs->global && gfs->background < gfs->global->ncol) {
@@ -1086,7 +1086,7 @@ static void scale_image_data_weighted(scale_context* sctx, Gif_Image* gfo,
         /* skip */;
     for (yi = yi0; yi != yi1; ++yi) {
         const scale_color* iscr = &sctx->iscr.data[sctx->iscr.width * yi];
-        scale_color* oscr = &kcx[gfo->width * yi];
+        scale_color* oscr = &kcx[(unsigned) gfo->width * yi];
         for (xo = 0; xo != gfo->width; ++xo)
             sc_clear(&oscr[xo]);
         for (w = ww; w->opos < gfo->left + gfo->width; ++w)
@@ -1100,7 +1100,7 @@ static void scale_image_data_weighted(scale_context* sctx, Gif_Image* gfo,
         for (xo = 0; xo != gfo->width; ++xo)
             sc_clear(&sc[xo]);
         for (; w->opos < gfo->top + yo + 1; ++w) {
-            const scale_color* iscr = &kcx[gfo->width * w->ipos];
+            const scale_color* iscr = &kcx[(unsigned) gfo->width * w->ipos];
             assert(w->ipos >= yi0 && w->ipos < yi1);
             for (xo = 0; xo != gfo->width; ++xo)
                 SCVEC_ADDVxF(sc[xo], iscr[xo], w->w);
@@ -1373,10 +1373,7 @@ resize_stream(Gif_Stream* gfs,
         sctx_init(&sctx, gfs, nw, nh);
         sctx.scale_colors = scale_colors;
 
-        set_progress_state(Scaling);
-
         for (sctx.imageno = 0; sctx.imageno < gfs->nimages; ++sctx.imageno) {
-            on_progress(6);
             sctx.gfi = gfs->images[sctx.imageno];
             scale_image(&sctx, method);
         }

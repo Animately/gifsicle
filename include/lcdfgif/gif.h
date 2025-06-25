@@ -1,5 +1,5 @@
 /* gif.h - Interface to the LCDF GIF library.
-   Copyright (C) 1997-2021 Eddie Kohler, ekohler@gmail.com
+   Copyright (C) 1997-2025 Eddie Kohler, ekohler@gmail.com
    This file is part of the LCDF GIF library.
 
    The GIF library is free software. It is distributed under the GNU General
@@ -261,16 +261,13 @@ void            Gif_SetErrorHandler(Gif_ReadErrorHandler handler);
 Gif_Stream*     Gif_ReadFile(FILE* f);
 Gif_Stream*     Gif_FullReadFile(FILE* f, int flags, const char* landmark,
                                  Gif_ReadErrorHandler handler);
-Gif_Stream *
-Gif_FullReadBuffer(const uint8_t* buffer, size_t size, int read_flags,
-                 const char* landmark, Gif_ReadErrorHandler h);
 Gif_Stream*     Gif_ReadRecord(const Gif_Record* record);
 Gif_Stream*     Gif_FullReadRecord(const Gif_Record* record, int flags,
                                    const char* landmark,
                                    Gif_ReadErrorHandler handler);
 int             Gif_WriteFile(Gif_Stream *gfs, FILE *f);
 int             Gif_FullWriteFile(Gif_Stream *gfs,
-                                  const Gif_CompressInfo *gcinfo, FILE *f, uint8_t** buffer, uint32_t* size);
+                                  const Gif_CompressInfo *gcinfo, FILE *f);
 
 #define Gif_ReadFile(f)         Gif_FullReadFile((f),GIF_READ_UNCOMPRESSED,0,0)
 #define Gif_ReadRecord(r)       Gif_FullReadRecord((r),GIF_READ_UNCOMPRESSED,0,0)
